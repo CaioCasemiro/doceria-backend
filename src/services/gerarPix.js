@@ -11,5 +11,3 @@ export default function gerarCodigoPix(Valor) {
 
     return codigo.toBRCode()
 }
-
-console.log(gerarCodigoPix(2))
