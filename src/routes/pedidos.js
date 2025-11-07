@@ -1,34 +1,41 @@
 import express from "express";
-import gerarCodigoPix from "../services/gerarPix.js"
+import gerarCodigoPix from "../services/gerarPix.js";
+import prisma from "../bd.js";
 
-const router = express.Router()
+const router = express.Router();
 
 router.post("/", async (req, res) => {
     try {
-        const pedido = req.body
-
+        const pedido = req.body;
 
         if (!pedido || !pedido.total) {
-            return res.status(400).json({ erro: "Pedido inválido" })
+            return res.status(400).json({ erro: "Pedido inválido" });
         }
 
-        console.log("total do pedido: ", pedido.total)
+        console.log("total do pedido: ", pedido.total);
 
-        if (!pedido.total) {
-            return res.status(400).json({ erro: "Total do pedido não definido" });
-        }
+        const codigoPix = gerarCodigoPix(pedido.total);
 
-        const codigoPix = gerarCodigoPix(pedido.total)
-        console.log("pedido recebido: ", pedido, "\nCódigo pix gerado: ", codigoPix)
+        const novoPedido = await prisma.pedido.create({
+            data: {
+                nome: pedido.nome || null,
+                itens: pedido.itens || [],
+                total: pedido.total,
+                codigoPix,
+                status: "recebido",
+            },
+        });
+
+        console.log("pedido salvo no banco:", novoPedido);
 
         return res.status(200).json({
-            messagem: "Pedido recebido com sucesso",
-            codigoPix
-        })
+            mensagem: "Pedido recebido e salvo com sucesso!",
+            codigoPix,
+        });
     } catch (erro) {
-        console.error(erro)
-        return res.status(500).json({ erro: "Erro ao processar pedido" })
+        console.error(erro);
+        return res.status(500).json({ erro: "Erro ao processar pedido" });
     }
-})
+});
 
-export default router
+export default router;
