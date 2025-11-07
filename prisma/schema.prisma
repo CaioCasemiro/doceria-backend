@@ -5,18 +5,19 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 model Pedido {
-  id          Int      @id @default(autoincrement())
-  nome        String?            
-  telefone    String
-  itens       Json?              
-  total       Float
+  id           Int      @id @default(autoincrement())
+  nome         String?
+  telefone     String
+  itens        Json
+  total        Float
   valorEntrega Float?
-  modoEntrega String
-  endereco    Json?              
-  status      String   @default("recebido")
-  criadoEm    DateTime @default(now())
+  modoEntrega  String
+  endereco     Json?
+  codigoPix    String
+  status       String
+  finalizado   Boolean  @default(false)
+  criadoEm     DateTime @default(now())
 }

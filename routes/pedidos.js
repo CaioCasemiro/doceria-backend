@@ -30,6 +30,7 @@ router.post("/", async (req, res) => {
 
         return res.status(200).json({
             mensagem: "Pedido recebido e salvo com sucesso!",
+            codigoPix: codigoPix,
             pedido: novoPedido
         });
     } catch (erro) {
@@ -47,6 +48,20 @@ router.get("/", async (req, res) => {
     } catch (erro) {
         console.error(erro);
         return res.status(500).json({ erro: "Erro ao buscar pedidos" });
+    }
+});
+
+router.patch("/:id/finalizar", async (req, res) => {
+    const { id } = req.params;
+    try {
+        const pedidoAtualizado = await prisma.pedido.update({
+            where: { id: Number(id) },
+            data: { finalizado: true },
+        });
+        return res.status(200).json(pedidoAtualizado);
+    } catch (erro) {
+        console.error(erro);
+        return res.status(500).json({ erro: "Erro ao atualizar pedido" });
     }
 });
 
