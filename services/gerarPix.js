@@ -1,4 +1,5 @@
 import { createStaticPix } from "pix-utils";
+import 'dotenv/config'
 
 
 export default function gerarCodigoPix(Valor) {
@@ -28,4 +29,3 @@ export default function gerarCodigoPix(Valor) {
 
     return codigo.toBRCode();
 }
-
