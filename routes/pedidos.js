@@ -1,6 +1,8 @@
 import express from "express";
 import gerarCodigoPix from "../services/gerarPix.js";
 import prisma from "../bd.js";
+import { verificarAdmin } from "../middleware/auth.js";
+
 
 const router = express.Router();
 
@@ -39,7 +41,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.get("/", async (req, res) => {
+router.get("/", verificarAdmin, async (req, res) => {
     try {
         const pedidos = await prisma.pedido.findMany({
             orderBy: { criadoEm: "desc" },
@@ -51,7 +53,7 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.patch("/:id/finalizar", async (req, res) => {
+router.patch("/:id/finalizar", verificarAdmin, async (req, res) => {
     const { id } = req.params;
     try {
         const pedidoAtualizado = await prisma.pedido.update({
