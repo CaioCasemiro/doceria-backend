@@ -6,8 +6,19 @@ import adminRouter from "./routes/admin.js";
 
 const app = express();
 
+const origensPermitidas = [
+  "https://adocicadadoceria.vercel.app",
+  "http://localhost:3000"
+];
+
 app.use(cors({
-  origin: "https://adocicadadoceria.vercel.app",
+  origin: function (origin, callback) {
+    if (!origin || origensPermitidas.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Origem não permitida pelo CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
