@@ -1,7 +1,10 @@
 import express from "express"
 import prisma from "../bd.js"
 import { verificarAdmin } from "../middleware/auth.js"
+import fs from "fs";
+import path from "path";
 
+const arquivoHorarios = path.resolve("horarios.json");
 const router = express.Router()
 
 router.get("/estoque", async (req, res) => {
@@ -91,6 +94,19 @@ router.delete("/estoque/:id", verificarAdmin, async (req, res) => {
         console.error("Erro ao remover doce:", erro);
         return res.status(500).json({ erro: "Erro ao remover doce" });
     }
+});
+
+router.get("/horarios", (req, res) => {
+    if (fs.existsSync(arquivoHorarios)) {
+        const data = fs.readFileSync(arquivoHorarios, "utf-8");
+        return res.json(JSON.parse(data));
+    }
+    return res.json({});
+});
+
+router.put("/horarios", (req, res) => {
+    fs.writeFileSync(arquivoHorarios, JSON.stringify(req.body, null, 2));
+    return res.json({ sucesso: true });
 });
 
 export default router;
