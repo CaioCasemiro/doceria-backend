@@ -1,6 +1,6 @@
 import express from "express"
-import prisma from "../bd"
-import { verificarAdmin } from "../middleware/auth"
+import prisma from "../bd.js"
+import { verificarAdmin } from "../middleware/auth.js"
 
 const router = express.Router()
 
@@ -22,7 +22,7 @@ router.get("/estoque", async (req, res) => {
     }
 })
 
-router.post("/estoque", async (req, res) => {
+router.post("/estoque", verificarAdmin, async (req, res) => {
     try {
         const { nome, imagem, quantidadeDisponivel = 0 } = req.body || {};
         if (!nome || !nome.trim()) {
@@ -45,7 +45,7 @@ router.post("/estoque", async (req, res) => {
 });
 
 
-router.put("/estoque/:id", async (req, res) => {
+router.put("/estoque/:id", verificarAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const { quantidadeDisponivel, nome, imagem } = req.body || {};
@@ -77,7 +77,7 @@ router.put("/estoque/:id", async (req, res) => {
 });
 
 
-router.delete("/estoque/:id", async (req, res) => {
+router.delete("/estoque/:id", verificarAdmin, async (req, res) => {
     try {
         const { id } = req.params;
         const doceExistente = await prisma.doce.findUnique({ where: { id: Number(id) } });
