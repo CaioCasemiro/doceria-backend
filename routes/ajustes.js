@@ -1,5 +1,4 @@
 import express from "express"
-import path from "path";
 import prisma from "../bd.js"
 import { verificarAdmin } from "../middleware/auth.js"
 import fs from "fs";
