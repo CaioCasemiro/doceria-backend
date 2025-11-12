@@ -21,3 +21,10 @@ model Pedido {
   finalizado   Boolean  @default(false)
   criadoEm     DateTime @default(now())
 }
+
+model Doce {
+  id                   Int     @id @default(autoincrement())
+  nome                 String
+  imagem               String  @default("")
+  quantidadeDisponivel Int     @default(0)
+}
