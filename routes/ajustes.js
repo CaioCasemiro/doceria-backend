@@ -13,6 +13,8 @@ router.get("/estoque", async (req, res) => {
                 nome: true,
                 imagem: true,
                 quantidadeDisponivel: true,
+                preco: true,
+                categoria: true,
             },
         });
         return res.status(200).json(doces);
@@ -24,7 +26,8 @@ router.get("/estoque", async (req, res) => {
 
 router.post("/estoque", verificarAdmin, async (req, res) => {
     try {
-        const { nome, imagem, quantidadeDisponivel = 0 } = req.body || {};
+        const { nome, imagem, quantidadeDisponivel = 0, preco = 0, categoria = null } = req.body || {};
+
         if (!nome || !nome.trim()) {
             return res.status(400).json({ erro: "Nome do doce é obrigatório" });
         }
@@ -33,7 +36,9 @@ router.post("/estoque", verificarAdmin, async (req, res) => {
             data: {
                 nome: nome.trim(),
                 imagem: imagem || "",
-                quantidadeDisponivel: Number(quantidadeDisponivel) || 0,
+                quantidadeDisponivel: Number(quantidadeDisponivel),
+                preco: Number(preco),
+                categoria,
             },
         });
 
@@ -47,13 +52,15 @@ router.post("/estoque", verificarAdmin, async (req, res) => {
 router.put("/estoque/:id", verificarAdmin, async (req, res) => {
     try {
         const { id } = req.params;
-        const { quantidadeDisponivel, nome, imagem } = req.body || {};
+        const { nome, imagem, quantidadeDisponivel, preco, categoria } = req.body || {};
 
         const dadosAtualizacao = {};
+        if (nome !== undefined) dadosAtualizacao.nome = nome.trim();
+        if (imagem !== undefined) dadosAtualizacao.imagem = imagem;
         if (quantidadeDisponivel !== undefined)
             dadosAtualizacao.quantidadeDisponivel = Number(quantidadeDisponivel);
-        if (nome !== undefined) dadosAtualizacao.nome = nome;
-        if (imagem !== undefined) dadosAtualizacao.imagem = imagem;
+        if (preco !== undefined) dadosAtualizacao.preco = Number(preco);
+        if (categoria !== undefined) dadosAtualizacao.categoria = categoria;
 
         if (Object.keys(dadosAtualizacao).length === 0) {
             return res.status(400).json({ erro: "Nenhum campo para atualizar" });

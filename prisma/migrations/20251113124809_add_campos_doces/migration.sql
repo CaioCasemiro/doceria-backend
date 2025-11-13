@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Doce" ADD COLUMN     "categoria" TEXT,
+ADD COLUMN     "preco" DOUBLE PRECISION NOT NULL DEFAULT 0.0;

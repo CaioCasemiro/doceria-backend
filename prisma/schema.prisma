@@ -27,4 +27,6 @@ model Doce {
   nome                 String
   imagem               String  @default("")
   quantidadeDisponivel Int     @default(0)
+  preco                Float       @default(0.0)
+  categoria            String?
 }
