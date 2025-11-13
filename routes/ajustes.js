@@ -15,6 +15,7 @@ router.get("/estoque", async (req, res) => {
                 quantidadeDisponivel: true,
                 preco: true,
                 categoria: true,
+                isDestaque: true,
             },
         });
         return res.status(200).json(doces);
@@ -26,10 +27,26 @@ router.get("/estoque", async (req, res) => {
 
 router.post("/estoque", verificarAdmin, async (req, res) => {
     try {
-        const { nome, imagem, quantidadeDisponivel = 0, preco = 0, categoria = null } = req.body || {};
+        const {
+            nome,
+            imagem,
+            quantidadeDisponivel = 0,
+            preco = 0,
+            categoria = null,
+            isDestaque = false,
+        } = req.body || {};
 
         if (!nome || !nome.trim()) {
             return res.status(400).json({ erro: "Nome do doce é obrigatório" });
+        }
+
+        if (isDestaque) {
+            const totalDestaques = await prisma.doce.count({
+                where: { isDestaque: true },
+            });
+            if (totalDestaques >= 5) {
+                return res.status(400).json({ erro: "Limite de 5 destaques atingido" });
+            }
         }
 
         const novoDoce = await prisma.doce.create({
@@ -39,6 +56,7 @@ router.post("/estoque", verificarAdmin, async (req, res) => {
                 quantidadeDisponivel: Number(quantidadeDisponivel),
                 preco: Number(preco),
                 categoria,
+                isDestaque: Boolean(isDestaque),
             },
         });
 
@@ -52,7 +70,14 @@ router.post("/estoque", verificarAdmin, async (req, res) => {
 router.put("/estoque/:id", verificarAdmin, async (req, res) => {
     try {
         const { id } = req.params;
-        const { nome, imagem, quantidadeDisponivel, preco, categoria } = req.body || {};
+        const { nome, imagem, quantidadeDisponivel, preco, categoria, isDestaque } = req.body || {};
+
+        const doceExistente = await prisma.doce.findUnique({
+            where: { id: Number(id) },
+        });
+        if (!doceExistente) {
+            return res.status(404).json({ erro: "Doce não encontrado" });
+        }
 
         const dadosAtualizacao = {};
         if (nome !== undefined) dadosAtualizacao.nome = nome.trim();
@@ -61,16 +86,15 @@ router.put("/estoque/:id", verificarAdmin, async (req, res) => {
             dadosAtualizacao.quantidadeDisponivel = Number(quantidadeDisponivel);
         if (preco !== undefined) dadosAtualizacao.preco = Number(preco);
         if (categoria !== undefined) dadosAtualizacao.categoria = categoria;
+        if (isDestaque !== undefined) dadosAtualizacao.isDestaque = Boolean(isDestaque);
 
-        if (Object.keys(dadosAtualizacao).length === 0) {
-            return res.status(400).json({ erro: "Nenhum campo para atualizar" });
-        }
-
-        const doceExistente = await prisma.doce.findUnique({
-            where: { id: Number(id) },
-        });
-        if (!doceExistente) {
-            return res.status(404).json({ erro: "Doce não encontrado" });
+        if (isDestaque) {
+            const totalDestaques = await prisma.doce.count({
+                where: { isDestaque: true, NOT: { id: Number(id) } },
+            });
+            if (totalDestaques >= 5) {
+                return res.status(400).json({ erro: "Limite de 5 destaques atingido" });
+            }
         }
 
         const doceAtualizado = await prisma.doce.update({
@@ -88,6 +112,7 @@ router.put("/estoque/:id", verificarAdmin, async (req, res) => {
 router.delete("/estoque/:id", verificarAdmin, async (req, res) => {
     try {
         const { id } = req.params;
+
         const doceExistente = await prisma.doce.findUnique({
             where: { id: Number(id) },
         });

@@ -29,4 +29,5 @@ model Doce {
   quantidadeDisponivel Int     @default(0)
   preco                Float       @default(0.0)
   categoria            String?
+  isDestaque           Boolean  @default(false)
 }
