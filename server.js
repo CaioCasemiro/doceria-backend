@@ -20,8 +20,9 @@ app.use(cors({
       callback(new Error("Origem não permitida pelo CORS"));
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  credentials: true
 }));
 app.use(express.json()); 
 
