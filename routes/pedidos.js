@@ -1,4 +1,3 @@
-js
 import express from "express";
 import gerarCodigoPix from "../services/gerarPix.js";
 import prisma from "../bd.js";
