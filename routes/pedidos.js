@@ -1,8 +1,8 @@
+js
 import express from "express";
 import gerarCodigoPix from "../services/gerarPix.js";
 import prisma from "../bd.js";
 import { verificarAdmin } from "../middleware/auth.js";
-
 
 const router = express.Router();
 
@@ -23,9 +23,10 @@ router.post("/", async (req, res) => {
             total: pedido.total,
             valorEntrega: pedido.valorEntrega || 0,
             modoEntrega: pedido.modoEntrega,
-            endereco: pedido.modoEntrega === "delivery"
-                ? pedido.endereco || null
-                : null,
+            endereco:
+                pedido.modoEntrega === "delivery"
+                    ? pedido.endereco || null
+                    : null,
             codigoPix,
             status: "recebido",
         };
@@ -40,24 +41,10 @@ router.post("/", async (req, res) => {
             data,
         });
 
-        const novoPedido = await prisma.pedido.create({
-            data: {
-                nome: pedido.nome || null,
-                telefone: pedido.telefone,
-                itens: pedido.itens || [],
-                total: pedido.total,
-                valorEntrega: pedido.valorEntrega || 0,
-                modoEntrega: pedido.modoEntrega,
-                endereco: pedido.modoEntrega === "delivery" ? pedido.endereco || null : null,
-                codigoPix,
-                status: "recebido",
-            },
-        });
-
         return res.status(200).json({
             mensagem: "Pedido recebido e salvo com sucesso!",
-            codigoPix: codigoPix,
-            pedido: novoPedido
+            codigoPix,
+            pedido: novoPedido,
         });
     } catch (erro) {
         console.error(erro);
@@ -70,6 +57,7 @@ router.get("/", verificarAdmin, async (req, res) => {
         const pedidos = await prisma.pedido.findMany({
             orderBy: { criadoEm: "desc" },
         });
+
         return res.status(200).json(pedidos);
     } catch (erro) {
         console.error(erro);
@@ -79,11 +67,13 @@ router.get("/", verificarAdmin, async (req, res) => {
 
 router.patch("/:id/finalizar", verificarAdmin, async (req, res) => {
     const { id } = req.params;
+
     try {
         const pedidoAtualizado = await prisma.pedido.update({
             where: { id: Number(id) },
             data: { finalizado: true },
         });
+
         return res.status(200).json(pedidoAtualizado);
     } catch (erro) {
         console.error(erro);
