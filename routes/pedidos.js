@@ -16,6 +16,9 @@ router.post("/", async (req, res) => {
 
         const codigoPix = gerarCodigoPix(pedido.total);
 
+        console.log(JSON.stringify(req.body, null, 2))
+        console.log(JSON.stringify(data, null, 2))
+
         const novoPedido = await prisma.pedido.create({
             data: {
                 nome: pedido.nome || null,
