@@ -16,8 +16,29 @@ router.post("/", async (req, res) => {
 
         const codigoPix = gerarCodigoPix(pedido.total);
 
-        console.log(JSON.stringify(req.body, null, 2))
-        console.log(JSON.stringify(data, null, 2))
+        const data = {
+            nome: pedido.nome || null,
+            telefone: pedido.telefone,
+            itens: pedido.itens || [],
+            total: pedido.total,
+            valorEntrega: pedido.valorEntrega || 0,
+            modoEntrega: pedido.modoEntrega,
+            endereco: pedido.modoEntrega === "delivery"
+                ? pedido.endereco || null
+                : null,
+            codigoPix,
+            status: "recebido",
+        };
+
+        console.log("REQ BODY:");
+        console.log(JSON.stringify(req.body, null, 2));
+
+        console.log("DATA:");
+        console.log(JSON.stringify(data, null, 2));
+
+        const novoPedido = await prisma.pedido.create({
+            data,
+        });
 
         const novoPedido = await prisma.pedido.create({
             data: {
