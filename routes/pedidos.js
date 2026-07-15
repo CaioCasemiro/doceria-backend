@@ -80,4 +80,52 @@ router.patch("/:id/finalizar", verificarAdmin, async (req, res) => {
     }
 });
 
+// Cliente consulta seus próprios pedidos pelo telefone (rota pública, sem login)
+router.get("/consulta", async (req, res) => {
+    const { telefone } = req.query;
+
+    if (!telefone) {
+        return res.status(400).json({ erro: "Informe o telefone para consultar" });
+    }
+
+    try {
+        const pedidos = await prisma.pedido.findMany({
+            where: { telefone: String(telefone) },
+            orderBy: { criadoEm: "desc" },
+            take: 10, // últimos 10 pedidos, evita retornar histórico gigante
+        });
+
+        return res.status(200).json(pedidos);
+    } catch (erro) {
+        console.error(erro);
+        return res.status(500).json({ erro: "Erro ao consultar pedidos" });
+    }
+});
+
+// Admin atualiza o status do pedido (recebido -> em_preparo -> pronto -> entregue)
+router.patch("/:id/status", verificarAdmin, async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const statusValidos = ["recebido", "em_preparo", "pronto", "entregue"];
+    if (!status || !statusValidos.includes(status)) {
+        return res.status(400).json({ erro: "Status inválido" });
+    }
+
+    try {
+        const pedidoAtualizado = await prisma.pedido.update({
+            where: { id: Number(id) },
+            data: {
+                status,
+                finalizado: status === "entregue",
+            },
+        });
+
+        return res.status(200).json(pedidoAtualizado);
+    } catch (erro) {
+        console.error(erro);
+        return res.status(500).json({ erro: "Erro ao atualizar status do pedido" });
+    }
+});
+
 export default router;
