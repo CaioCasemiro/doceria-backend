@@ -4,6 +4,7 @@ import 'dotenv/config'
 import pedidosRouter from "./routes/pedidos.js";
 import adminRouter from "./routes/admin.js";
 import ajustesRouter from "./routes/ajustes.js";
+import healthRouter from "./routes/health.js";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use("/pedidos", pedidosRouter);
 app.use("/admin", adminRouter);
 app.use("/admin/ajustes", ajustesRouter);
+app.use("/health", healthRouter);
 
 const PORT = 3001;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
